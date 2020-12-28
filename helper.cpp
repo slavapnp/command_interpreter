@@ -22,7 +22,7 @@ string_view skip_ws(string_view str) {
 	while (cur != str.end() && contains(ws, *cur))
 		++cur;
 
-	return string_view(cur, str.end() - cur);
+	return string_view(&*cur, str.end() - cur);
 }
 
 template<>
@@ -57,7 +57,7 @@ int get_param(string_view& sv)
 		throw invalid_argument(mess);
 	}
 
-	sv = string_view(res.ptr, sv.end() - res.ptr);
+	sv = string_view(res.ptr, &sv.data()[sv.size()] - res.ptr);
 	return value;
 };
 
@@ -83,7 +83,7 @@ double get_param(string_view& sv)
 	// TODO: remove string because of memory allocations
 	string s1(sv.data(), sv.size());
 	char* end;
-	float value = strtod(s1.c_str(), &end);
+	double value = strtod(s1.c_str(), &end);
 	auto len = end - s1.data();
 	sv = string_view(sv.data() + len, sv.size() - len);
 	return value;
@@ -97,8 +97,8 @@ string_view get_param(string_view& sv)
 	auto cur = sv.begin();
 	while (cur != sv.end() && !contains(ws, *cur))
 		++cur;
-	string_view ret = string_view(sv.begin(), cur - sv.begin());
-	sv = string_view(cur, sv.end() - cur);
+	string_view ret = string_view(sv.data(), cur - sv.begin());
+	sv = string_view(&*cur, sv.end() - cur);
 	return ret;
 };
 
@@ -114,8 +114,8 @@ const char* get_param(string_view& sv)
 	while (cur != sv.end() && !contains(ws, *cur))
 		++cur;
 
-	strncpy(buffer, sv.begin(), cur - sv.begin());
-	sv = string_view(cur, sv.end() - cur);
+	strncpy(buffer, sv.data(), cur - sv.begin());
+	sv = string_view(&*cur, sv.end() - cur);
 	return buffer;
 }
 

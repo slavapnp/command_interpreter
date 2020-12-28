@@ -19,8 +19,8 @@ tuple<string_view, string_view> parse_cmd(string_view str) {
 			&& (in_range('A', 'Z', *cur) || *cur == '_'
 					|| in_range('0', '9', *cur)))
 		++cur;
-	return make_tuple(string_view(cur, str.end() - cur),
-			string_view(str.begin(), cur - str.begin()));
+	return make_tuple(string_view(&str.data()[cur - str.begin()], str.end() - cur),
+			string_view(str.data(), cur - str.begin()));
 }
 
 command_t interpreter::find_command(string_view cmd_s) {
